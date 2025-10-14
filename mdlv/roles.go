@@ -5,8 +5,8 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/gatekit/auth"
-	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/restkit/auth"
+	"github.com/chains-lab/restkit/roles"
 )
 
 func RoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http.Handler) http.Handler {
