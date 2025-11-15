@@ -13,9 +13,6 @@ import (
 
 const (
 	AuthorizationHeader = "Authorization"
-	IpHeader            = "X-User-IP"
-	UserAgentHeader     = "X-User-Agent"
-	ClientTxHeader      = "X-Client-Tx"
 )
 
 func Auth(ctxKey interface{}, skUser string) func(http.Handler) http.Handler {
@@ -55,7 +52,7 @@ func Auth(ctxKey interface{}, skUser string) func(http.Handler) http.Handler {
 			userID, err := uuid.Parse(userData.Subject)
 			if err != nil {
 				ape.RenderErr(w,
-					problems.Unauthorized("User ID is nov valid"),
+					problems.Unauthorized("UserID ID is nov valid"),
 				)
 
 				return
@@ -66,69 +63,6 @@ func Auth(ctxKey interface{}, skUser string) func(http.Handler) http.Handler {
 				SessionID: userData.SessionID,
 				Role:      userData.Role,
 			})
-
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-func Ip(ctxKey interface{}) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-
-			ip := r.Header.Get(IpHeader)
-			if ip == "" {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing X-User-IP header"),
-				)
-
-				return
-			}
-
-			ctx = context.WithValue(ctx, ctxKey, ip)
-
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-func UserAgent(ctxKey interface{}) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-
-			ua := r.Header.Get(UserAgentHeader)
-			if ua == "" {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing X-User-Agent header"),
-				)
-
-				return
-			}
-
-			ctx = context.WithValue(ctx, ctxKey, ua)
-
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-func Client(ctxKey interface{}) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-
-			client := r.Header.Get(ClientTxHeader)
-			if client == "" {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing X-Client-Tx header"),
-				)
-
-				return
-			}
-
-			ctx = context.WithValue(ctx, ctxKey, client)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

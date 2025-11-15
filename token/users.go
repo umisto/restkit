@@ -11,11 +11,6 @@ type UsersClaims struct {
 	jwt.RegisteredClaims
 	Role      string    `json:"role"`
 	SessionID uuid.UUID `json:"session_id"`
-
-	CityID      *uuid.UUID `json:"city_id,omitempty"`
-	CityRole    *string    `json:"city_role,omitempty"`
-	CompanyID   *uuid.UUID `json:"company_id,omitempty"`
-	CompanyRole *string    `json:"company_role,omitempty"`
 }
 
 func VerifyUserJWT(tokenString, sk string) (UsersClaims, error) {
@@ -30,17 +25,12 @@ func VerifyUserJWT(tokenString, sk string) (UsersClaims, error) {
 }
 
 type GenerateUserJwtRequest struct {
-	Issuer   string        `json:"iss"`
-	Audience []string      `json:"aud"`
-	User     uuid.UUID     `json:"sub"`
-	Session  uuid.UUID     `json:"session_id"`
-	Role     string        `json:"role"`
-	Ttl      time.Duration `json:"ttl"`
-
-	CityID      *uuid.UUID `json:"city_id,omitempty"`
-	CityRole    *string    `json:"city_role,omitempty"`
-	CompanyID   *uuid.UUID `json:"company_id,omitempty"`
-	CompanyRole *string    `json:"company_role,omitempty"`
+	Issuer    string        `json:"iss"`
+	Audience  []string      `json:"aud"`
+	UserID    uuid.UUID     `json:"sub"`
+	SessionID uuid.UUID     `json:"session_id"`
+	Role      string        `json:"role"`
+	Ttl       time.Duration `json:"ttl"`
 }
 
 func GenerateUserJWT(
@@ -51,16 +41,12 @@ func GenerateUserJWT(
 	claims := &UsersClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    request.Issuer,
-			Subject:   request.User.String(),
+			Subject:   request.UserID.String(),
 			Audience:  jwt.ClaimStrings(request.Audience),
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
-		SessionID:   request.Session,
-		Role:        request.Role,
-		CityID:      request.CityID,
-		CityRole:    request.CityRole,
-		CompanyID:   request.CompanyID,
-		CompanyRole: request.CompanyRole,
+		SessionID: request.SessionID,
+		Role:      request.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -68,11 +54,7 @@ func GenerateUserJWT(
 }
 
 type UserData struct {
-	ID          uuid.UUID
-	SessionID   uuid.UUID
-	Role        string
-	CityID      *uuid.UUID
-	CityRole    *string
-	CompanyID   *uuid.UUID
-	CompanyRole *string
+	ID        uuid.UUID
+	SessionID uuid.UUID
+	Role      string
 }

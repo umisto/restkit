@@ -9,7 +9,7 @@ import (
 	"github.com/chains-lab/restkit/token"
 )
 
-func RoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http.Handler) http.Handler {
+func SystemRoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -23,9 +23,9 @@ func RoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http.Handl
 				return
 			}
 
-			if err := roles.ParseRole(user.Role); err != nil {
+			if err := roles.ValidateUserSystemRole(user.Role); err != nil {
 				ape.RenderErr(w,
-					problems.Unauthorized("User role not valid"),
+					problems.Unauthorized("SystemUser role not valid"),
 				)
 
 				return
@@ -33,7 +33,7 @@ func RoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http.Handl
 
 			if !allowedRoles[user.Role] {
 				ape.RenderErr(w,
-					problems.Forbidden("User role not allowedRoles"),
+					problems.Forbidden("SystemUser role not allowedRoles"),
 				)
 
 				return
