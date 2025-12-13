@@ -14,7 +14,7 @@ func SystemRoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			user, ok := ctx.Value(ctxKey).(token.UserData)
+			user, ok := ctx.Value(ctxKey).(token.AccountData)
 			if !ok {
 				ape.RenderErr(w,
 					problems.Unauthorized("Missing AuthorizationHeader header"),

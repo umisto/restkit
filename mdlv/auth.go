@@ -40,7 +40,7 @@ func Auth(ctxKey interface{}, skUser string) func(http.Handler) http.Handler {
 
 			tokenString := parts[1]
 
-			userData, err := token.VerifyUserJWT(tokenString, skUser)
+			userData, err := token.VerifyAccountJWT(tokenString, skUser)
 			if err != nil {
 				ape.RenderErr(w,
 					problems.Unauthorized("Token validation failed"),
@@ -58,10 +58,11 @@ func Auth(ctxKey interface{}, skUser string) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx = context.WithValue(ctx, ctxKey, token.UserData{
+			ctx = context.WithValue(ctx, ctxKey, token.AccountData{
 				ID:        userID,
 				SessionID: userData.SessionID,
 				Role:      userData.Role,
+				Username:  userData.Username,
 			})
 
 			next.ServeHTTP(w, r.WithContext(ctx))

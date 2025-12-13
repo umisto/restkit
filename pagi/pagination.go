@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func GetPagination(r *http.Request) (page, size uint64) {
+func GetPagination(r *http.Request) (page, size int32) {
 	page = 1
 	size = 20
 
@@ -13,24 +13,24 @@ func GetPagination(r *http.Request) (page, size uint64) {
 
 	pageStr := params.Get("page")
 	if pageStr != "" {
-		n, err := strconv.ParseUint(pageStr, 10, 64)
+		n, err := strconv.ParseInt(pageStr, 10, 32)
 		if err == nil {
-			page = n
+			page = int32(n)
 		}
 	}
 
 	sizeStr := params.Get("size")
 	if sizeStr != "" {
-		n, err := strconv.ParseUint(sizeStr, 10, 64)
+		n, err := strconv.ParseInt(sizeStr, 10, 32)
 		if err == nil {
-			size = n
+			size = int32(n)
 		}
 	}
 
 	return page, size
 }
 
-func PagConvert(page, size uint64) (limit, offset uint64) {
+func PagConvert(page, size int32) (limit, offset int32) {
 	if page == 0 {
 		page = 1
 	}
