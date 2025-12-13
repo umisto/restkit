@@ -25,7 +25,7 @@ func SystemRoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http
 
 			if err := roles.ValidateUserSystemRole(user.Role); err != nil {
 				ape.RenderErr(w,
-					problems.Unauthorized("SystemUser role not valid"),
+					problems.Unauthorized("account role not valid"),
 				)
 
 				return
@@ -33,7 +33,7 @@ func SystemRoleGrant(ctxKey interface{}, allowedRoles map[string]bool) func(http
 
 			if !allowedRoles[user.Role] {
 				ape.RenderErr(w,
-					problems.Forbidden("SystemUser role not allowedRoles"),
+					problems.Forbidden("account role not allowedRoles"),
 				)
 
 				return
