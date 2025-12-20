@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/chains-lab/ape"
-	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/restkit/token"
 	"github.com/google/uuid"
+	"github.com/umisto/ape"
+	"github.com/umisto/ape/problems"
+	"github.com/umisto/restkit/token"
 )
 
 const (

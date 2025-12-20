@@ -1,11 +1,11 @@
-module github.com/chains-lab/restkit
+module github.com/umisto/restkit
 
 go 1.24.5
 
 require (
-	github.com/chains-lab/ape v0.4.10
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
+	github.com/umisto/ape v0.4.15
 )
 
 require (
