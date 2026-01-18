@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/netbill/ape"
-	"github.com/netbill/ape/problems"
+	"github.com/netbill/restkit/ape"
+	"github.com/netbill/restkit/ape/problems"
 	"github.com/netbill/restkit/token"
 )
 

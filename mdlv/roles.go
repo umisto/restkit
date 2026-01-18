@@ -3,10 +3,10 @@ package mdlv
 import (
 	"net/http"
 
-	"github.com/netbill/ape"
-	"github.com/netbill/ape/problems"
-	"github.com/netbill/restkit/roles"
+	"github.com/netbill/restkit/ape"
+	"github.com/netbill/restkit/ape/problems"
 	"github.com/netbill/restkit/token"
+	"github.com/netbill/restkit/token/roles"
 )
 
 func (s Service) RoleGrant(allowedRoles map[string]bool) func(http.Handler) http.Handler {
