@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/netbill/restkit/ape"
 	"github.com/netbill/restkit/ape/problems"
-	"github.com/netbill/restkit/token"
+	"github.com/netbill/restkit/auth"
 )
 
 const (
@@ -40,7 +40,7 @@ func (s Service) Auth() func(http.Handler) http.Handler {
 
 			tokenString := parts[1]
 
-			userData, err := token.VerifyAccountJWT(tokenString, s.skUser)
+			userData, err := auth.VerifyAccountJWT(tokenString, s.skUser)
 			if err != nil {
 				ape.RenderErr(w,
 					problems.Unauthorized("Token validation failed"),
@@ -58,7 +58,7 @@ func (s Service) Auth() func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx = context.WithValue(ctx, s.ctxKey, token.AccountData{
+			ctx = context.WithValue(ctx, s.ctxKey, auth.AccountData{
 				ID:        userID,
 				SessionID: userData.SessionID,
 				Role:      userData.Role,

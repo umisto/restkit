@@ -5,8 +5,8 @@ import (
 
 	"github.com/netbill/restkit/ape"
 	"github.com/netbill/restkit/ape/problems"
-	"github.com/netbill/restkit/token"
-	"github.com/netbill/restkit/token/roles"
+	"github.com/netbill/restkit/auth"
+	"github.com/netbill/restkit/auth/roles"
 )
 
 func (s Service) RoleGrant(allowedRoles map[string]bool) func(http.Handler) http.Handler {
@@ -14,7 +14,7 @@ func (s Service) RoleGrant(allowedRoles map[string]bool) func(http.Handler) http
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			user, ok := ctx.Value(s.ctxKey).(token.AccountData)
+			user, ok := ctx.Value(s.ctxKey).(auth.AccountData)
 			if !ok {
 				ape.RenderErr(w,
 					problems.Unauthorized("Missing AuthorizationHeader header"),
