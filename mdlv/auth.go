@@ -22,18 +22,16 @@ func (s Service) Auth() func(http.Handler) http.Handler {
 
 			authHeader := r.Header.Get(AuthorizationHeader)
 			if authHeader == "" {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing AuthorizationHeader header"),
-				)
+				s.log.Errorf("missing AuthorizationHeader header")
+				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
 
 				return
 			}
 
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing AuthorizationHeader header"),
-				)
+				s.log.Errorf("missing AuthorizationHeader header")
+				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
 
 				return
 			}
@@ -42,18 +40,16 @@ func (s Service) Auth() func(http.Handler) http.Handler {
 
 			userData, err := auth.VerifyAccountJWT(tokenString, s.skUser)
 			if err != nil {
-				ape.RenderErr(w,
-					problems.Unauthorized("Token validation failed"),
-				)
+				s.log.WithError(err).Errorf("token validation failed")
+				ape.RenderErr(w, problems.Unauthorized("Token validation failed"))
 
 				return
 			}
 
 			userID, err := uuid.Parse(userData.Subject)
 			if err != nil {
-				ape.RenderErr(w,
-					problems.Unauthorized("UserID ID is nov valid"),
-				)
+				s.log.WithError(err).Errorf("subject filed in token is nov valid")
+				ape.RenderErr(w, problems.Unauthorized("Token validation failed"))
 
 				return
 			}

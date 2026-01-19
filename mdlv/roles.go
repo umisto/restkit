@@ -16,25 +16,22 @@ func (s Service) RoleGrant(allowedRoles map[string]bool) func(http.Handler) http
 
 			user, ok := ctx.Value(s.ctxKey).(auth.AccountData)
 			if !ok {
-				ape.RenderErr(w,
-					problems.Unauthorized("Missing AuthorizationHeader header"),
-				)
+				s.log.Errorf("missing AuthorizationHeader header")
+				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
 
 				return
 			}
 
 			if err := roles.ValidateUserSystemRole(user.Role); err != nil {
-				ape.RenderErr(w,
-					problems.Unauthorized("account role not valid"),
-				)
+				s.log.WithError(err).Errorf("account role not valid")
+				ape.RenderErr(w, problems.Unauthorized("account role not valid"))
 
 				return
 			}
 
 			if !allowedRoles[user.Role] {
-				ape.RenderErr(w,
-					problems.Forbidden("account role not allowedRoles"),
-				)
+				s.log.Errorf("account role not allowedRoles")
+				ape.RenderErr(w, problems.Forbidden("account role not allowedRoles"))
 
 				return
 			}
