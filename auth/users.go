@@ -9,7 +9,6 @@ import (
 
 type AccountClaims struct {
 	jwt.RegisteredClaims
-	Username  string    `json:"username"`
 	Role      string    `json:"role"`
 	SessionID uuid.UUID `json:"session_id"`
 }
@@ -31,7 +30,6 @@ type GenerateAccountJwtRequest struct {
 	AccountID uuid.UUID     `json:"sub"`
 	SessionID uuid.UUID     `json:"session_id"`
 	Role      string        `json:"role"`
-	Username  string        `json:"username"`
 	Ttl       time.Duration `json:"ttl"`
 }
 
@@ -47,7 +45,6 @@ func GenerateAccountJWT(
 			Audience:  jwt.ClaimStrings(request.Audience),
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
-		Username:  request.Username,
 		SessionID: request.SessionID,
 		Role:      request.Role,
 	}
@@ -60,5 +57,4 @@ type AccountData struct {
 	ID        uuid.UUID
 	SessionID uuid.UUID
 	Role      string
-	Username  string
 }

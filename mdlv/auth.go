@@ -58,7 +58,6 @@ func (s Service) Auth() func(http.Handler) http.Handler {
 				ID:        userID,
 				SessionID: userData.SessionID,
 				Role:      userData.Role,
-				Username:  userData.Username,
 			})
 
 			next.ServeHTTP(w, r.WithContext(ctx))
