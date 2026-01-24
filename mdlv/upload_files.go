@@ -11,23 +11,22 @@ import (
 	"github.com/netbill/restkit/tokens"
 )
 
-const (
-	AuthorizationHeader = "Authorization"
-)
+const UploadHeader = "Upload-Token"
 
-func AccountAuth(
+func UploadFiles(
 	log logium.Logger,
 	ctxKey int,
 	sk string,
+	scope string,
 ) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			authHeader := r.Header.Get(AuthorizationHeader)
+			authHeader := r.Header.Get(UploadHeader)
 			if authHeader == "" {
-				log.Errorf("missing AuthorizationHeader header")
-				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
+				log.Errorf("missing %s header", UploadHeader)
+				ape.RenderErr(w, problems.Unauthorized("Missing Upload-Token header"))
 
 				return
 			}
@@ -42,7 +41,7 @@ func AccountAuth(
 
 			tokenString := parts[1]
 
-			accountData, err := tokens.ParseAccountJWT(tokenString, sk)
+			uploadSessionData, err := tokens.ParseUploadAvatarClaims(tokenString, sk)
 			if err != nil {
 				log.WithError(err).Errorf("token validation failed")
 				ape.RenderErr(w, problems.Unauthorized("Token validation failed"))
@@ -50,11 +49,14 @@ func AccountAuth(
 				return
 			}
 
-			ctx = context.WithValue(ctx, ctxKey, tokens.AccountJwtData{
-				AccountID: accountData.AccountID,
-				SessionID: accountData.SessionID,
-				Role:      accountData.Role,
-			})
+			if uploadSessionData.Scope != scope {
+				log.Errorf("invalid token scope")
+				ape.RenderErr(w, problems.Unauthorized("Invalid token scope"))
+
+				return
+			}
+
+			ctx = context.WithValue(ctx, ctxKey, uploadSessionData)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
