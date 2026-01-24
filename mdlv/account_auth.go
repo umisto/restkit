@@ -16,7 +16,7 @@ const (
 )
 
 func AccountAuth(
-	log logium.Logger,
+	log *logium.Logger,
 	ctxKey int,
 	sk string,
 ) func(http.Handler) http.Handler {

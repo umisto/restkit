@@ -11,7 +11,7 @@ import (
 )
 
 func AccountRoleGrant(
-	log logium.Logger,
+	log *logium.Logger,
 	ctxKey int,
 	allowedRoles map[string]bool,
 ) func(http.Handler) http.Handler {
