@@ -3,9 +3,9 @@ package mdlv
 import (
 	"net/http"
 
+	"github.com/netbill/ape"
+	"github.com/netbill/ape/problems"
 	"github.com/netbill/logium"
-	"github.com/netbill/restkit/ape"
-	"github.com/netbill/restkit/ape/problems"
 	"github.com/netbill/restkit/tokens"
 	"github.com/netbill/restkit/tokens/roles"
 )
