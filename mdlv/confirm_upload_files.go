@@ -13,7 +13,7 @@ import (
 
 const UploadHeader = "Upload-Token"
 
-func UploadFiles(
+func ConfirmUploadFiles(
 	log logium.Logger,
 	ctxKey int,
 	sk string,

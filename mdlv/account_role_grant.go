@@ -10,7 +10,7 @@ import (
 	"github.com/netbill/restkit/tokens/roles"
 )
 
-func AccountRolesGrant(
+func AccountRoleGrant(
 	log logium.Logger,
 	ctxKey int,
 	allowedRoles map[string]bool,
