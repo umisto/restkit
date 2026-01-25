@@ -50,8 +50,12 @@ type AccountJwtData struct {
 func ParseAccountJWT(tokenStr string, sk string) (AccountJwtData, error) {
 	claims := AccountClaims{}
 	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, jwt.ErrSignatureInvalid
+		}
 		return []byte(sk), nil
 	})
+
 	if err != nil || !token.Valid {
 		return AccountJwtData{}, err
 	}

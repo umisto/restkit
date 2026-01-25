@@ -33,8 +33,8 @@ func ConfirmUploadFiles(
 
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-				log.Errorf("missing AuthorizationHeader header")
-				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
+				log.Errorf("missing Upload-Token header")
+				ape.RenderErr(w, problems.Unauthorized("Missing Upload-Token header"))
 
 				return
 			}
@@ -43,15 +43,15 @@ func ConfirmUploadFiles(
 
 			uploadSessionData, err := tokens.ParseUploadAvatarClaims(tokenString, sk)
 			if err != nil {
-				log.WithError(err).Errorf("token validation failed")
-				ape.RenderErr(w, problems.Unauthorized("Token validation failed"))
+				log.WithError(err).Errorf("upload token validation failed")
+				ape.RenderErr(w, problems.Unauthorized("upload token validation failed"))
 
 				return
 			}
 
 			if uploadSessionData.Scope != scope {
-				log.Errorf("invalid token scope")
-				ape.RenderErr(w, problems.Unauthorized("Invalid token scope"))
+				log.Errorf("invalid upload token scope")
+				ape.RenderErr(w, problems.Unauthorized("invalid upload token scope"))
 
 				return
 			}

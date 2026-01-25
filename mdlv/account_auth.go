@@ -26,16 +26,16 @@ func AccountAuth(
 
 			authHeader := r.Header.Get(AuthorizationHeader)
 			if authHeader == "" {
-				log.Errorf("missing AuthorizationHeader header")
-				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
+				log.Errorf("missing Authorization  header")
+				ape.RenderErr(w, problems.Unauthorized("Missing Authorization header"))
 
 				return
 			}
 
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-				log.Errorf("missing AuthorizationHeader header")
-				ape.RenderErr(w, problems.Unauthorized("Missing AuthorizationHeader header"))
+				log.Errorf("missing Authorization header")
+				ape.RenderErr(w, problems.Unauthorized("Missing Authorization header"))
 
 				return
 			}

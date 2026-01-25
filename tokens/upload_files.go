@@ -45,14 +45,18 @@ type UploadFilesJwtData struct {
 
 func ParseUploadAvatarClaims(tokenStr string, sk string) (UploadFilesJwtData, error) {
 	claims := UploadFilesClaims{}
+
 	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, jwt.ErrSignatureInvalid
+		}
 		return []byte(sk), nil
 	})
 	if err != nil || !token.Valid {
 		return UploadFilesJwtData{}, err
 	}
 
-	sessionID, err := uuid.Parse(tokenStr)
+	sessionID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return UploadFilesJwtData{}, err
 	}
