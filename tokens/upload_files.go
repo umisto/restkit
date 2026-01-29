@@ -9,15 +9,19 @@ import (
 
 type UploadFilesClaims struct {
 	jwt.RegisteredClaims
-	Scope string `json:"scope"`
+	UploadSessionID uuid.UUID `json:"upload_session_id"`
+	ResourceID      string    `json:"resource_id"`
+	Resource        string    `json:"resource"`
 }
 
 type GenerateUploadFilesJwtRequest struct {
-	SessionID uuid.UUID     `json:"session_id"`
-	Issuer    string        `json:"iss"`
-	Audience  []string      `json:"aud"`
-	Scope     string        `json:"scope"`
-	Ttl       time.Duration `json:"ttl"`
+	OwnerAccountID  uuid.UUID     `json:"sub"`
+	UploadSessionID uuid.UUID     `json:"upload_session_id"`
+	ResourceID      string        `json:"resource_id"`
+	Resource        string        `json:"resource"`
+	Issuer          string        `json:"iss"`
+	Audience        []string      `json:"aud"`
+	Ttl             time.Duration `json:"ttl"`
 }
 
 func NewUploadFileToken(
@@ -27,11 +31,13 @@ func NewUploadFileToken(
 	claims := &UploadFilesClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    req.Issuer,
-			Subject:   req.SessionID.String(),
-			Audience:  jwt.ClaimStrings([]string{req.Issuer}),
+			Subject:   req.OwnerAccountID.String(),
+			Audience:  jwt.ClaimStrings(req.Audience),
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(req.Ttl)),
 		},
-		Scope: req.Scope,
+		UploadSessionID: req.UploadSessionID,
+		ResourceID:      req.ResourceID,
+		Resource:        req.Resource,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -39,11 +45,14 @@ func NewUploadFileToken(
 }
 
 type UploadFilesJwtData struct {
-	SessionID uuid.UUID
-	Scope     string
+	OwnerAccountID  uuid.UUID
+	UploadSessionID uuid.UUID
+	ResourceID      string
+	Resource        string
+	Audience        []string
 }
 
-func ParseUploadAvatarClaims(tokenStr string, sk string) (UploadFilesJwtData, error) {
+func ParseUploadFilesClaims(tokenStr string, sk string) (UploadFilesJwtData, error) {
 	claims := UploadFilesClaims{}
 
 	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
@@ -56,13 +65,16 @@ func ParseUploadAvatarClaims(tokenStr string, sk string) (UploadFilesJwtData, er
 		return UploadFilesJwtData{}, err
 	}
 
-	sessionID, err := uuid.Parse(claims.Subject)
+	ownerID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return UploadFilesJwtData{}, err
 	}
 
 	return UploadFilesJwtData{
-		SessionID: sessionID,
-		Scope:     claims.Scope,
+		OwnerAccountID:  ownerID,
+		UploadSessionID: claims.UploadSessionID,
+		ResourceID:      claims.ResourceID,
+		Resource:        claims.Resource,
+		Audience:        claims.Audience,
 	}, nil
 }

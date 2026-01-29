@@ -15,7 +15,6 @@ type AccountClaims struct {
 
 type GenerateAccountJwtRequest struct {
 	Issuer    string        `json:"iss"`
-	Audience  []string      `json:"aud"`
 	AccountID uuid.UUID     `json:"sub"`
 	SessionID uuid.UUID     `json:"session_id"`
 	Role      string        `json:"role"`
@@ -30,7 +29,6 @@ func GenerateAccountJWT(
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    req.Issuer,
 			Subject:   req.AccountID.String(),
-			Audience:  jwt.ClaimStrings(req.Audience),
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(req.Ttl)),
 		},
 		SessionID: req.SessionID,
