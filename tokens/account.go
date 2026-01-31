@@ -1,7 +1,7 @@
 package tokens
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -13,59 +13,50 @@ type AccountClaims struct {
 	SessionID uuid.UUID `json:"session_id"`
 }
 
-type GenerateAccountJwtRequest struct {
-	Issuer    string        `json:"iss"`
-	AccountID uuid.UUID     `json:"sub"`
-	SessionID uuid.UUID     `json:"session_id"`
-	Role      string        `json:"role"`
-	Ttl       time.Duration `json:"ttl"`
+func (c AccountClaims) GetAccountRole() string {
+	return c.Role
 }
 
-func GenerateAccountJWT(
-	req GenerateAccountJwtRequest,
-	sk string,
-) (string, error) {
-	claims := &AccountClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    req.Issuer,
-			Subject:   req.AccountID.String(),
-			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(req.Ttl)),
-		},
-		SessionID: req.SessionID,
-		Role:      req.Role,
+func (c AccountClaims) GetSessionID() uuid.UUID {
+	return c.SessionID
+}
+
+func (c AccountClaims) GetAccountID() uuid.UUID {
+	return uuid.MustParse(c.RegisteredClaims.Subject)
+}
+
+func (c AccountClaims) Validate() error {
+	_, err := uuid.Parse(c.RegisteredClaims.Subject)
+	if err != nil {
+		return fmt.Errorf("invalid subject UUID: %w", err)
+	}
+	if c.SessionID == uuid.Nil {
+		return fmt.Errorf("session_id cannot be nil UUID")
+	}
+	err = ValidateUserSystemRole(c.Role)
+	if err != nil {
+		return fmt.Errorf("invalid account role: %w", err)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(sk))
+	return nil
 }
 
-type AccountJwtData struct {
-	AccountID uuid.UUID
-	SessionID uuid.UUID
-	Role      string
+func (c AccountClaims) GenerateJWT(sk string) (string, error) {
+	err := c.Validate()
+	if err != nil {
+		return "", err
+	}
+
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, c).SignedString([]byte(sk))
 }
 
-func ParseAccountJWT(tokenStr string, sk string) (AccountJwtData, error) {
-	claims := AccountClaims{}
-	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
+func ParseAccountJWT(tokenStr string, sk string) (claims AccountClaims, err error) {
+	_, err = jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, jwt.ErrSignatureInvalid
 		}
 		return []byte(sk), nil
 	})
 
-	if err != nil || !token.Valid {
-		return AccountJwtData{}, err
-	}
-
-	accountID, err := uuid.Parse(claims.Subject)
-	if err != nil {
-		return AccountJwtData{}, err
-	}
-
-	return AccountJwtData{
-		AccountID: accountID,
-		SessionID: claims.SessionID,
-		Role:      claims.Role,
-	}, nil
+	return claims, err
 }

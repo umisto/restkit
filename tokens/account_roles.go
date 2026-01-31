@@ -1,4 +1,4 @@
-package roles
+package tokens
 
 import (
 	"fmt"
@@ -6,15 +6,15 @@ import (
 )
 
 const (
-	SystemAdmin = "admin"
-	SystemModer = "moderator"
-	SystemUser  = "user"
+	RoleSystemAdmin = "admin"
+	RoleSystemModer = "moderator"
+	RoleSystemUser  = "user"
 )
 
 var userSystemRoleAllowed = []string{
-	SystemAdmin,
-	SystemModer,
-	SystemUser,
+	RoleSystemAdmin,
+	RoleSystemModer,
+	RoleSystemUser,
 }
 
 var ErrorInvalidUserSystemRole = fmt.Errorf("role must be one of: %s", GetAllSystemUserRoles())
@@ -30,9 +30,9 @@ func ValidateUserSystemRole(i string) error {
 }
 
 var PriorityUserSystemRoles = map[string]uint8{
-	SystemAdmin: math.MaxUint8,
-	SystemModer: 2,
-	SystemUser:  1,
+	RoleSystemAdmin: math.MaxUint8,
+	RoleSystemModer: 2,
+	RoleSystemUser:  1,
 }
 
 // CompareSystemUserRoles
