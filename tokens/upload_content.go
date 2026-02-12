@@ -11,14 +11,14 @@ type UploadContentClaims struct {
 	jwt.RegisteredClaims
 	UploadSessionID uuid.UUID `json:"upload_session_id"`
 	ResourceID      string    `json:"resource_id"`
-	Resource        string    `json:"resource"`
+	ResourceType    string    `json:"resourcetype"`
 }
 
 func (c UploadContentClaims) GetOwnerAccountID() uuid.UUID {
 	return uuid.MustParse(c.RegisteredClaims.Subject)
 }
 
-func (c UploadContentClaims) GetUploadSessionID() uuid.UUID {
+func (c UploadContentClaims) GetSessionID() uuid.UUID {
 	return c.UploadSessionID
 }
 
@@ -27,7 +27,7 @@ func (c UploadContentClaims) GetResourceID() string {
 }
 
 func (c UploadContentClaims) GetResource() string {
-	return c.Resource
+	return c.ResourceType
 }
 
 func (c UploadContentClaims) Validate() error {
@@ -41,8 +41,8 @@ func (c UploadContentClaims) Validate() error {
 	if c.ResourceID == "" {
 		return fmt.Errorf("resource_id cannot be empty")
 	}
-	if c.Resource == "" {
-		return fmt.Errorf("resource cannot be empty")
+	if c.ResourceType == "" {
+		return fmt.Errorf("resource_type cannot be empty")
 	}
 
 	return nil
@@ -65,4 +65,11 @@ func ParseUploadFilesClaims(tokenStr string, sk string) (claims UploadContentCla
 		return []byte(sk), nil
 	})
 	return claims, err
+}
+
+type UploadContent interface {
+	GetOwnerAccountID() uuid.UUID
+	GetSessionID() uuid.UUID
+	GetResourceID() string
+	GetResource() string
 }

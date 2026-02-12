@@ -41,7 +41,7 @@ func UploadContentGrant(
 		return tokens.UploadContentClaims{}, problems.Unauthorized("upload token validation failed")
 	}
 
-	if uploadSessionData.Resource != params.Resource {
+	if uploadSessionData.ResourceType != params.Resource {
 		return tokens.UploadContentClaims{}, problems.Unauthorized("invalid upload token resource")
 	}
 
