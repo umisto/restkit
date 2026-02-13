@@ -7,25 +7,25 @@ import (
 	"github.com/google/uuid"
 )
 
-type AccountClaims struct {
+type AccountAuthClaims struct {
 	jwt.RegisteredClaims
 	Role      string    `json:"role"`
 	SessionID uuid.UUID `json:"session_id"`
 }
 
-func (c AccountClaims) GetAccountRole() string {
+func (c AccountAuthClaims) GetRole() string {
 	return c.Role
 }
 
-func (c AccountClaims) GetSessionID() uuid.UUID {
+func (c AccountAuthClaims) GetSessionID() uuid.UUID {
 	return c.SessionID
 }
 
-func (c AccountClaims) GetAccountID() uuid.UUID {
+func (c AccountAuthClaims) GetAccountID() uuid.UUID {
 	return uuid.MustParse(c.RegisteredClaims.Subject)
 }
 
-func (c AccountClaims) Validate() error {
+func (c AccountAuthClaims) Validate() error {
 	_, err := uuid.Parse(c.RegisteredClaims.Subject)
 	if err != nil {
 		return fmt.Errorf("invalid subject UUID: %w", err)
@@ -41,7 +41,7 @@ func (c AccountClaims) Validate() error {
 	return nil
 }
 
-func (c AccountClaims) GenerateJWT(sk string) (string, error) {
+func (c AccountAuthClaims) GenerateJWT(sk string) (string, error) {
 	err := c.Validate()
 	if err != nil {
 		return "", err
@@ -50,7 +50,7 @@ func (c AccountClaims) GenerateJWT(sk string) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, c).SignedString([]byte(sk))
 }
 
-func ParseAccountJWT(tokenStr string, sk string) (claims AccountClaims, err error) {
+func ParseAccountJWT(tokenStr string, sk string) (claims AccountAuthClaims, err error) {
 	_, err = jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, jwt.ErrSignatureInvalid

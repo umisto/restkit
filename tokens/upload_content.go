@@ -14,7 +14,7 @@ type UploadContentClaims struct {
 	ResourceType    string    `json:"resourcetype"`
 }
 
-func (c UploadContentClaims) GetOwnerAccountID() uuid.UUID {
+func (c UploadContentClaims) GetAccountID() uuid.UUID {
 	return uuid.MustParse(c.RegisteredClaims.Subject)
 }
 
@@ -65,11 +65,4 @@ func ParseUploadFilesClaims(tokenStr string, sk string) (claims UploadContentCla
 		return []byte(sk), nil
 	})
 	return claims, err
-}
-
-type UploadContent interface {
-	GetOwnerAccountID() uuid.UUID
-	GetSessionID() uuid.UUID
-	GetResourceID() string
-	GetResource() string
 }
